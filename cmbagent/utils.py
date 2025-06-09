@@ -173,7 +173,7 @@ def get_api_keys_from_env():
     }
     return api_keys
 
-def get_model_config(model, api_keys):
+def get_model_config(model, api_keys, stream=False):
     config = {
         "model": model,
         "api_key": None,
@@ -201,15 +201,17 @@ def get_model_config(model, api_keys):
             "api_key": api_keys["OPENAI"],
             "api_type": "openai"
         })
+    if stream:
+        config["stream"] = True
     return config
 
 api_keys_env = get_api_keys_from_env()
 
 for agent in default_agents_llm_model:
-    default_agent_llm_configs[agent] =  get_model_config(default_agents_llm_model[agent], api_keys_env)
+    default_agent_llm_configs[agent] =  get_model_config(default_agents_llm_model[agent], api_keys_env, stream=True)
 
 
-default_llm_config_list = [get_model_config(default_llm_model, api_keys_env)]
+default_llm_config_list = [get_model_config(default_llm_model, api_keys_env, stream=True)]
 
 
 #### note we should be able to set the temperature for different agents, e.g., 
