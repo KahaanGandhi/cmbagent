@@ -208,10 +208,10 @@ def get_model_config(model, api_keys, stream=False):
 api_keys_env = get_api_keys_from_env()
 
 for agent in default_agents_llm_model:
-    default_agent_llm_configs[agent] =  get_model_config(default_agents_llm_model[agent], api_keys_env, stream=True)
+    default_agent_llm_configs[agent] =  get_model_config(default_agents_llm_model[agent], api_keys_env)
 
 
-default_llm_config_list = [get_model_config(default_llm_model, api_keys_env, stream=True)]
+default_llm_config_list = [get_model_config(default_llm_model, api_keys_env)]
 
 
 #### note we should be able to set the temperature for different agents, e.g., 

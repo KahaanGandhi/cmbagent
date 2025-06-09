@@ -67,6 +67,7 @@ class CMBAgent:
                  temperature=default_temperature,
                  top_p=default_top_p,
                  timeout=1200,
+                 stream=False,
                  max_round=default_max_round,
                  platform='oai',
                  model='gpt4o',
@@ -123,6 +124,7 @@ class CMBAgent:
             cache_seed (int, optional): Seed for caching. Defaults to 42.
             temperature (float, optional): Temperature for LLM sampling. Defaults to 0.
             timeout (int, optional): Timeout for LLM requests in seconds. Defaults to 1200.
+            stream (bool, optional): If True, stream tokens as they arrive. Defaults to False.
             max_round (int, optional): Maximum number of conversation rounds. Defaults to 50. If too small, the conversation stops.
             llm_api_key (str, optional): API key for LLM. If None, uses the key from the config file.
             make_vector_stores (bool or list of strings, optional): Whether to create vector stores. Defaults to False. For only subset, use, e.g., make_vector_stores= ['cobaya', 'camb'].
@@ -146,7 +148,7 @@ class CMBAgent:
         """
         if default_llm_model != default_llm_model_default:
             print(f"Warning: default_llm_model is set to {default_llm_model} in cmbagent.py")
-            default_llm_config_list = [get_model_config(default_llm_model, get_api_keys_from_env(), stream=True)]
+            default_llm_config_list = [get_model_config(default_llm_model, get_api_keys_from_env(), stream=stream)]
 
         self.kwargs = kwargs
 
@@ -214,7 +216,7 @@ class CMBAgent:
                         "temperature": temperature,
                         "top_p": top_p,
                         "config_list": llm_config_list,
-                        "stream": True,
+                        "stream": stream,
                         "timeout": timeout,
                         "check_every_ms": None,
                     }
@@ -237,10 +239,10 @@ class CMBAgent:
 
         if api_keys is not None:
 
-            self.llm_config["config_list"][0] = get_model_config(self.llm_config["config_list"][0]["model"], api_keys, stream=True)
+            self.llm_config["config_list"][0] = get_model_config(self.llm_config["config_list"][0]["model"], api_keys, stream=stream)
             
             for agent in self.agent_llm_configs.keys():                
-                self.agent_llm_configs[agent] = get_model_config(self.agent_llm_configs[agent]["model"], api_keys, stream=True)
+                self.agent_llm_configs[agent] = get_model_config(self.agent_llm_configs[agent]["model"], api_keys, stream=stream)
 
         self.init_agents(agent_llm_configs=self.agent_llm_configs) # initialize agents
 
@@ -939,8 +941,8 @@ def planning_and_control_context_carryover(
     if api_keys is None:
         api_keys = get_api_keys_from_env()
 
-    planner_config = get_model_config(planner_model, api_keys, stream=True)
-    plan_reviewer_config = get_model_config(plan_reviewer_model, api_keys, stream=True)
+    planner_config = get_model_config(planner_model, api_keys)
+    plan_reviewer_config = get_model_config(plan_reviewer_model, api_keys)
     
     cmbagent = CMBAgent(work_dir = planning_dir,
                         default_llm_model = default_llm_model,
@@ -984,11 +986,11 @@ def planning_and_control_context_carryover(
     print(f"\nPlanning took {execution_time_planning:.4f} seconds\n")
     
     ## control
-    engineer_config = get_model_config(engineer_model, api_keys, stream=True)
-    researcher_config = get_model_config(researcher_model, api_keys, stream=True)
-    camb_context_config = get_model_config(camb_context_model, api_keys, stream=True)
-    idea_maker_config = get_model_config(idea_maker_model, api_keys, stream=True)
-    idea_hater_config = get_model_config(idea_hater_model, api_keys, stream=True)
+    engineer_config = get_model_config(engineer_model, api_keys)
+    researcher_config = get_model_config(researcher_model, api_keys)
+    camb_context_config = get_model_config(camb_context_model, api_keys)
+    idea_maker_config = get_model_config(idea_maker_model, api_keys)
+    idea_hater_config = get_model_config(idea_hater_model, api_keys)
         
     control_dir = Path(work_dir).expanduser().resolve() / "control"
 
@@ -1162,8 +1164,8 @@ def planning_and_control(
     if api_keys is None:
         api_keys = get_api_keys_from_env()
 
-    planner_config = get_model_config(planner_model, api_keys, stream=True)
-    plan_reviewer_config = get_model_config(plan_reviewer_model, api_keys, stream=True)
+    planner_config = get_model_config(planner_model, api_keys)
+    plan_reviewer_config = get_model_config(plan_reviewer_model, api_keys)
     
     cmbagent = CMBAgent(work_dir = planning_dir,
                         agent_llm_configs = {
@@ -1209,10 +1211,10 @@ def planning_and_control(
     print(f"Planning took {execution_time_planning:.4f} seconds")
     
     ## control
-    engineer_config = get_model_config(engineer_model, api_keys, stream=True)
-    researcher_config = get_model_config(researcher_model, api_keys, stream=True)
-    idea_maker_config = get_model_config(idea_maker_model, api_keys, stream=True)
-    idea_hater_config = get_model_config(idea_hater_model, api_keys, stream=True)
+    engineer_config = get_model_config(engineer_model, api_keys)
+    researcher_config = get_model_config(researcher_model, api_keys)
+    idea_maker_config = get_model_config(idea_maker_model, api_keys)
+    idea_hater_config = get_model_config(idea_hater_model, api_keys)
         
     control_dir = Path(work_dir).expanduser().resolve() / "control"
 
@@ -1332,10 +1334,10 @@ def control(
         api_keys = get_api_keys_from_env()
 
     ## control
-    engineer_config = get_model_config(engineer_model, api_keys, stream=True)
-    researcher_config = get_model_config(researcher_model, api_keys, stream=True)
-    idea_maker_config = get_model_config(idea_maker_model, api_keys, stream=True)
-    idea_hater_config = get_model_config(idea_hater_model, api_keys, stream=True)
+    engineer_config = get_model_config(engineer_model, api_keys)
+    researcher_config = get_model_config(researcher_model, api_keys)
+    idea_maker_config = get_model_config(idea_maker_model, api_keys)
+    idea_hater_config = get_model_config(idea_hater_model, api_keys)
         
     control_dir = Path(work_dir).expanduser().resolve() / "control"
 
@@ -1405,14 +1407,15 @@ def one_shot(
             agent = 'engineer',
             work_dir = work_dir_default,
             api_keys = None,
+            stream = False,
             ):
     start_time = time.time()
 
     if api_keys is None:
         api_keys = get_api_keys_from_env()
     
-    engineer_config = get_model_config(engineer_model, api_keys, stream=True)
-    researcher_config = get_model_config(researcher_model, api_keys, stream=True)
+    engineer_config = get_model_config(engineer_model, api_keys, stream=stream)
+    researcher_config = get_model_config(researcher_model, api_keys, stream=stream)
         
     cmbagent = CMBAgent(
         mode = "one_shot",
@@ -1421,7 +1424,8 @@ def one_shot(
                             'engineer': engineer_config,
                             'researcher': researcher_config,
         },
-        api_keys = api_keys
+        api_keys = api_keys,
+        stream = stream
         )
         
     end_time = time.time()
@@ -1529,8 +1533,8 @@ def human_in_the_loop(task,
     if api_keys is None:
         api_keys = get_api_keys_from_env()
 
-    engineer_config = get_model_config(engineer_model, api_keys, stream=True)
-    researcher_config = get_model_config(researcher_model, api_keys, stream=True)
+    engineer_config = get_model_config(engineer_model, api_keys)
+    researcher_config = get_model_config(researcher_model, api_keys)
 
     cmbagent = CMBAgent(
         work_dir = work_dir,

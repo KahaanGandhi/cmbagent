@@ -1,9 +1,9 @@
-from autogen import OpenAIWrapper, get_config_list
+import os
+from cmbagent import one_shot
 
 if __name__ == "__main__":
     api_key = input("Enter your OpenAI API key: ").strip()
-    configs = get_config_list(api_keys=[api_key], stream=True)
-    wrapper = OpenAIWrapper(config_list=configs)
+    os.environ["OPENAI_API_KEY"] = api_key
     print("Sending request with streaming enabled:\n")
-    wrapper.create(messages=[{"role": "user", "content": "Hello"}], stream=True)
-    print()  # newline after streaming output
+    one_shot("Say hello to streaming", stream=True)
+
