@@ -173,7 +173,7 @@ def get_api_keys_from_env():
     }
     return api_keys
 
-def get_model_config(model, api_keys):
+def get_model_config(model, api_keys, stream=False):
     config = {
         "model": model,
         "api_key": None,
@@ -201,6 +201,8 @@ def get_model_config(model, api_keys):
             "api_key": api_keys["OPENAI"],
             "api_type": "openai"
         })
+    if stream:
+        config["stream"] = True
     return config
 
 api_keys_env = get_api_keys_from_env()
